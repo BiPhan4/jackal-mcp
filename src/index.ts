@@ -86,15 +86,15 @@ const server = new McpServer({
 });
 
 server.tool(
-  "send-tokens",
-  "Send tokens to a user",
+  "send-money",
+  "Send money to a user",
   {
     recipient: z.string().describe("The recipient's address"),
-    amount: z.string().describe("Amount of tokens to send (without denomination)"),
-    memo: z.string().optional().describe("Optional memo to include with the transaction"),
+    amount: z.string().describe("Amount to send (without denomination)"),
+    memo: z.string().optional().describe("Optional memo to include with the transfer"),
   },
   async ({ recipient, amount, memo }) => {
-    console.log("send-tokens tool called with:", { recipient, amount, memo });
+    console.log("send-money tool called with:", { recipient, amount, memo });
     try {
       // Force reload environment variables
       const envPath = path.resolve(process.cwd(), '.env');
@@ -144,7 +144,7 @@ server.tool(
         ],
       };
     } catch (error) {
-      console.error("Error in send-tokens:", error);
+      console.error("Error in send-money:", error);
       throw error;
     }
   },
