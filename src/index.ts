@@ -91,9 +91,10 @@ server.tool(
   {
     recipient: z.string().describe("The recipient's address"),
     amount: z.string().describe("Amount of tokens to send (without denomination)"),
+    memo: z.string().optional().describe("Optional memo to include with the transaction"),
   },
-  async ({ recipient, amount }) => {
-    console.log("send-tokens tool called with:", { recipient, amount });
+  async ({ recipient, amount, memo }) => {
+    console.log("send-tokens tool called with:", { recipient, amount, memo });
     try {
       // Force reload environment variables
       const envPath = path.resolve(process.cwd(), '.env');
@@ -112,7 +113,7 @@ server.tool(
       
       // check if given wallet has enough balance 
       console.log("Checking balance...");
-      const {amount: balance} = await client.getBalance(address, wasmdConfig.feeToken); 
+      const {amount: balance} = await client.getBalance(address, "ujkl"); 
       console.log("Balance checked:", balance);
 
       // Send tokens
@@ -129,7 +130,8 @@ server.tool(
         address,
         recipient,
         [{ denom: "ujkl", amount: microAmount }],
-        fee
+        fee,
+        memo || "" // Include memo if provided, otherwise empty string
       );
       console.log("Tokens sent successfully");
 
@@ -137,7 +139,7 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `Successfully sent ${amount} tokens to ${recipient}. Transaction hash: ${result.transactionHash}`,
+            text: `Successfully sent ${amount} tokens to ${recipient}${memo ? ` with memo: ${memo}` : ""}. Transaction hash: ${result.transactionHash}`,
           },
         ],
       };
