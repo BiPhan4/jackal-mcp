@@ -285,6 +285,47 @@ server.tool(
   },
 );
 
+server.tool(
+  "save-text",
+  "Save text content to a file",
+  {
+    content: z.string().describe("The text content to save"),
+    filename: z.string().describe("The name of the file to save to"),
+  },
+  async ({ content, filename }) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      // Ensure the filename is safe and doesn't contain path traversal
+      const safeFilename = path.basename(filename);
+      const filePath = path.join(process.cwd(), safeFilename);
+      
+      // Write the content to the file
+      await fs.promises.writeFile(filePath, content, 'utf8');
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully saved text to ${safeFilename}`,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error saving text file:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to save text file: ${error.message}`,
+          },
+        ],
+      };
+    }
+  },
+);
+
 // Start the server
 async function main() {
   const transport = new StdioServerTransport();
