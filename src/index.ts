@@ -7,6 +7,7 @@ import { getMnemonic } from "./helpers/utils.js";
 import { jklTestnetConfig, wasmdConfig } from "./helpers/networks.js";
 import path from "path";
 import dotenv from "dotenv";
+import { saveText, getText, getAllTexts, deleteText } from "./helpers/database.js";
 
 
 const NWS_API_BASE = "https://api.weather.gov";
@@ -287,38 +288,150 @@ server.tool(
 
 server.tool(
   "save-text",
-  "Save text content to a file",
+  "Save text content to the database",
   {
     content: z.string().describe("The text content to save"),
     filename: z.string().describe("The name of the file to save to"),
   },
   async ({ content, filename }) => {
     try {
-      const fs = await import('fs');
-      const path = await import('path');
-      
-      // Ensure the filename is safe and doesn't contain path traversal
-      const safeFilename = path.basename(filename);
-      const filePath = path.join(process.cwd(), safeFilename);
-      
-      // Write the content to the file
-      await fs.promises.writeFile(filePath, content, 'utf8');
+      const result = await saveText(content, filename);
       
       return {
         content: [
           {
             type: "text",
-            text: `Successfully saved text to ${safeFilename}`,
+            text: `Successfully saved text to database with ID: ${result.id}`,
           },
         ],
       };
     } catch (error: any) {
-      console.error("Error saving text file:", error);
+      console.error("Error saving text to database:", error);
       return {
         content: [
           {
             type: "text",
-            text: `Failed to save text file: ${error.message}`,
+            text: `Failed to save text to database: ${error.message}`,
+          },
+        ],
+      };
+    }
+  },
+);
+
+server.tool(
+  "get-text",
+  "Retrieve text content from the database",
+  {
+    id: z.number().describe("The ID of the text to retrieve"),
+  },
+  async ({ id }) => {
+    try {
+      const text = await getText(id);
+      
+      if (!text) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No text found with ID: ${id}`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Text content (ID: ${text.id}):\n${text.content}`,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error retrieving text from database:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to retrieve text from database: ${error.message}`,
+          },
+        ],
+      };
+    }
+  },
+);
+
+server.tool(
+  "list-texts",
+  "List all saved texts from the database",
+  {},
+  async () => {
+    try {
+      const texts = await getAllTexts();
+      
+      if (texts.length === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: "No texts found in database",
+            },
+          ],
+        };
+      }
+
+      const textList = texts.map(text => 
+        `ID: ${text.id}\nFilename: ${text.filename}\nCreated: ${text.created_at}\n---`
+      ).join('\n');
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Saved texts:\n\n${textList}`,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error listing texts from database:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to list texts from database: ${error.message}`,
+          },
+        ],
+      };
+    }
+  },
+);
+
+server.tool(
+  "delete-text",
+  "Delete text content from the database",
+  {
+    id: z.number().describe("The ID of the text to delete"),
+  },
+  async ({ id }) => {
+    try {
+      await deleteText(id);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully deleted text with ID: ${id}`,
+          },
+        ],
+      };
+    } catch (error: any) {
+      console.error("Error deleting text from database:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to delete text from database: ${error.message}`,
           },
         ],
       };
