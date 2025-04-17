@@ -8,12 +8,61 @@ import { jklTestnetConfig, wasmdConfig } from "./helpers/networks.js";
 import path from "path";
 import dotenv from "dotenv";
 import { saveText, getText, getAllTexts, deleteText } from "./helpers/database.js";
+import FormData from "form-data"; 
+import fetch from "node-fetch";   
+import fs from "fs";             
 
 // Create server instance
 const server = new McpServer({
   name: "weather",
   version: "1.0.0",
 });
+
+server.tool(
+  "upload-to-jackal",
+  "upload a file to the Jackal protocol using PIN",
+  {
+    filepath: z.string().describe("Path to the file")
+  }, 
+  async ({filepath}) => {
+    try {
+      const form = new FormData();
+
+      form.append("file", fs.createReadStream(filepath));
+
+      const options = {
+        method: 'POST',
+        headers: {Authorization: `Bearer ${process.env.JACKAL_PIN_TOKEN}`, 
+        ...form.getHeaders(),
+        },
+        body: form,
+      };
+
+      const response = await fetch("https://pinapi.jackalprotocol.com/api/files", options);
+      const json = await response.json();
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `File uploaded successfully. Response: ${JSON.stringify(json)}`,
+          },
+        ],
+      };
+    } catch (err) {
+      const error = err as Error;
+      console.error("Upload error:", err);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to upload file: ${error.message}`,
+          },
+        ],
+      };
+    }
+  }
+)
 
 server.tool(
   "send-tokens",
