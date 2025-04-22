@@ -1,5 +1,7 @@
 // data from https://github.com/cosmos/chain-registry/tree/master/testnets
 import { GasPrice } from "@cosmjs/stargate";
+const mainnetChainID = 'jackal-1' 
+const testnetChainID = 'lupulella-2' 
 
 export interface Network {
   chainId: string;
@@ -39,3 +41,101 @@ export const jklMainnetConfig: Network = {
   // TODO: set up faucet
   faucetUrl: "",
 };
+
+export const mainnet = {
+  chainConfig: {
+      chainId: mainnetChainID,
+      chainName: 'Jackal Test Net',
+      rpc: 'https://testnet-rpc.jackalprotocol.com:443',
+      rest: 'https://testnet-rpc.jackalprotocol.com:443',
+      bip44: {
+          coinType: 118
+      },
+      stakeCurrency: {
+          coinDenom: 'JKL',
+          coinMinimalDenom: 'ujkl',
+          coinDecimals: 6
+      },
+      bech32Config: {
+          bech32PrefixAccAddr: 'jkl',
+          bech32PrefixAccPub: 'jklpub',
+          bech32PrefixValAddr: 'jklvaloper',
+          bech32PrefixValPub: 'jklvaloperpub',
+          bech32PrefixConsAddr: 'jklvalcons',
+          bech32PrefixConsPub: 'jklvalconspub'
+      },
+      currencies: [
+          {
+              coinDenom: 'JKL',
+              coinMinimalDenom: 'ujkl',
+              coinDecimals: 6
+          }
+      ],
+      feeCurrencies: [
+          {
+              coinDenom: 'JKL',
+              coinMinimalDenom: 'ujkl',
+              coinDecimals: 6,
+              gasPriceStep: {
+                  low: 0.002,
+                  average: 0.002,
+                  high: 0.02
+              }
+          }
+      ],
+      features: []
+  },
+  chainId: testnetChainID,
+  endpoint: 'https://testnet-rpc.jackalprotocol.com:443',
+  options: {},
+  networks: ['jackal'] // WARNING: do we need to call this 'lupulella'? 
+}
+
+export const testnet = {
+  chainConfig: {
+      chainId: mainnetChainID,
+      chainName: 'Jackal Main Net',
+      rpc: 'https://internalrpc.jackalprotocol.com',
+      rest: 'https://internalapi.jackalprotocol.com',
+      bip44: {
+          coinType: 118
+      },
+      stakeCurrency: {
+          coinDenom: 'JKL',
+          coinMinimalDenom: 'ujkl',
+          coinDecimals: 6
+      },
+      bech32Config: {
+          bech32PrefixAccAddr: 'jkl',
+          bech32PrefixAccPub: 'jklpub',
+          bech32PrefixValAddr: 'jklvaloper',
+          bech32PrefixValPub: 'jklvaloperpub',
+          bech32PrefixConsAddr: 'jklvalcons',
+          bech32PrefixConsPub: 'jklvalconspub'
+      },
+      currencies: [
+          {
+              coinDenom: 'JKL',
+              coinMinimalDenom: 'ujkl',
+              coinDecimals: 6
+          }
+      ],
+      feeCurrencies: [
+          {
+              coinDenom: 'JKL',
+              coinMinimalDenom: 'ujkl',
+              coinDecimals: 6,
+              gasPriceStep: {
+                  low: 0.002,
+                  average: 0.002,
+                  high: 0.02
+              }
+          }
+      ],
+      features: []
+  },
+  chainId: mainnetChainID,
+  endpoint: 'https://internalrpc.jackalprotocol.com',
+  options: {},
+  networks: ['jackal']
+}
