@@ -26,41 +26,15 @@ function startExpressServer(storage: IStorageHandler) {
   const app = express()
   const port = 3088
 
-  app.get('/:address/:ulid', async (req: Request, res: Response) => {
-    const address = req.params.address
-    const ulid = req.params.ulid
-    const key = req.query.key
+  // code below might not work with our official tutorial?
+  // https://docs.jackalprotocol.com/devs/jjs-quickstart.html
 
-    const downloadOptions = {
-      ulid: ulid,
-      linkKey: key,
-      trackers: {
-        chunks: [],
-        progress: 0
-      },
-      userAddress: address
-    }
+  
 
-    try {
-      const file = await storage.downloadByUlid(downloadOptions)
-      res.setHeader("Content-Disposition", `inline; filename=\"${file.name}\"`);
-      res.setHeader("Content-Type", file.type);
-      res.send(Buffer.from(await file.arrayBuffer()));
-    } catch (e) {
-      res.status(404).send("File not found.");
-    }
-  });
-
-  app.get('/', (req: Request, res: Response) => {
-    res.send('Hello Jackal!');
-  });
-
-  app.listen(port, () => {
-    console.log(`Express file-sharing gateway listening on port ${port}`);
-  });
 }
 
 async function init() {
+
   try {
     const setup: IClientSetup = {
       selectedWallet: "mnemonic",
@@ -68,7 +42,6 @@ async function init() {
       ...testnet, 
       networks: ['jackal'] as jackaljs.TSockets[],
   }
-
 
   const myClient = await ClientHandler.connect(setup)
   const storage: IStorageHandler = await myClient.createStorageHandler()
