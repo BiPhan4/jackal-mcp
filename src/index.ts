@@ -14,7 +14,7 @@ import fs from "fs";
 import { Request, Response } from 'express';
 import WebSocket from 'ws';
 (globalThis as any).WebSocket = WebSocket; 
-import * as jackaljs from '@jackallabs/jackal.js'
+import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
 import type { IClientSetup, IStorageHandler } from '@jackallabs/jackal.js'
 
@@ -40,7 +40,7 @@ async function init() {
       selectedWallet: "mnemonic",
       mnemonic: `${process.env.JKLTESTSEED}`,
       ...testnet, 
-      networks: ['jackal'] as jackaljs.TSockets[],
+      networks: ['jackal'] as TSockets[],
   }
 
   const myClient = await ClientHandler.connect(setup)
