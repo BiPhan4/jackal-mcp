@@ -49,9 +49,14 @@ async function init() {
       networks: ['jackal'] as TSockets[],
   }
 
+  console.log("got setup object")
+
   const myClient = await ClientHandler.connect(setup)
+  console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
+  console.log("created storage handler")
   storage.loadProviderPool()
+  console.log("loaded provider pool")
 
   return storage;
   } catch (e) {
