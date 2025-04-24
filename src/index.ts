@@ -35,7 +35,7 @@ function startExpressServer(storage: IStorageHandler) {
 
 // Create server instance
 const server = new McpServer({
-  name: "weather",
+  name: "jackal",
   version: "1.0.0",
 });
 
