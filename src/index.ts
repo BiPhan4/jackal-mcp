@@ -34,6 +34,7 @@ function startExpressServer(storage: IStorageHandler) {
 }
 
 async function init() {
+  dotenv.config();
 
   try {
 
