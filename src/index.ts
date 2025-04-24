@@ -18,6 +18,8 @@ import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
 import type { IClientSetup, IStorageHandler } from '@jackallabs/jackal.js'
 
+// jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
+
 const chainId = 'lupulella-2'
 
 function startExpressServer(storage: IStorageHandler) {
@@ -25,11 +27,6 @@ function startExpressServer(storage: IStorageHandler) {
   const express = require('express')
   const app = express()
   const port = 3088
-
-  // code below might not work with our official tutorial?
-  // https://docs.jackalprotocol.com/devs/jjs-quickstart.html
-
-  
 
 }
 
@@ -39,52 +36,49 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-server.tool(
-  "upload-to-jackal",
-  "upload a file to the Jackal protocol using PIN",
-  {
-    filepath: z.string().describe("Path to the file")
-  }, 
-  async ({filepath}) => {
-    try {
-      const form = new FormData();
+export function registerTools(storagehandler: IStorageHandler) {
+  server.tool(
+    "buy-storage",
+    "buy a storage plan from the jackal protocol",
+    {
+      // filepath: z.string().describe("Path to the file") // don't need? 
+    }, 
+    async ({/*filepath*/}) => { // don't need?
 
-      form.append("file", fs.createReadStream(filepath));
+      try {
 
-      const options = {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${process.env.JACKAL_PIN_TOKEN}`, 
-        ...form.getHeaders(),
-        },
-        body: form,
-      };
+        const options = {
+          gb: 1000,
+          days: 365
+        }
 
-      const response = await fetch("https://pinapi.jackalprotocol.com/api/files", options);
-      const json = await response.json();
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `File uploaded successfully. Response: ${JSON.stringify(json)}`,
-          },
-        ],
-      };
-    } catch (err) {
-      const error = err as Error;
-      console.error("Upload error:", err);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to upload file: ${error.message}`,
-          },
-        ],
-      };
+        await storagehandler.purchaseStoragePlan(options)
+      
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully purchased storage.`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("Purchase error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to buy storage: ${error.message}`,
+            },
+          ],
+        };
+      }
     }
-  }
-)
+  )
 
+  // can register more tools here 
+}
 
 async function init() {
   dotenv.config();
@@ -125,6 +119,9 @@ async function main() {
   console.error("Jackal MCP Server running on stdio");
 
   const storageHandler = await init();
+  registerTools(storageHandler); // 🔥 all tools now wired up with shared access
+
+  // TODO: I don't think we need the express server
   startExpressServer(storageHandler); // Both MCP and express should be running here
   console.log("everything ready to go!")
 }
