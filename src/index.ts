@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { connect } from "./helpers/connect.js";
-import { Network } from "./helpers/networks.js";
+import { mainnet, Network, testnet } from "./helpers/networks.js";
 import { getMnemonic } from "./helpers/utils.js";
 import { jklTestnetConfig, wasmdConfig } from "./helpers/networks.js";
 import path from "path";
@@ -10,128 +10,120 @@ import dotenv from "dotenv";
 import { saveText, getText, getAllTexts, deleteText } from "./helpers/database.js";
 import FormData from "form-data"; 
 import fetch from "node-fetch";   
-import fs from "fs";             
+import fs from "fs";    
+import { Request, Response } from 'express';
+import WebSocket from 'ws';
+(globalThis as any).WebSocket = WebSocket; 
+import { TSockets } from "@jackallabs/jackal.js";
+import { ClientHandler } from '@jackallabs/jackal.js'
+import type { IClientSetup, IStorageHandler } from '@jackallabs/jackal.js'
+
+// jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
+
+const chainId = 'lupulella-2'
+
+function startExpressServer(storage: IStorageHandler) {
+
+  const express = require('express')
+  const app = express()
+  const port = 3088
+
+}
 
 // Create server instance
 const server = new McpServer({
-  name: "weather",
+  name: "jackal",
   version: "1.0.0",
 });
 
-server.tool(
-  "upload-to-jackal",
-  "upload a file to the Jackal protocol using PIN",
-  {
-    filepath: z.string().describe("Path to the file")
-  }, 
-  async ({filepath}) => {
-    try {
-      const form = new FormData();
+export function registerTools(storagehandler: IStorageHandler) {
+  server.tool(
+    "buy-storage",
+    "buy a storage plan from the jackal protocol",
+    {
+      // filepath: z.string().describe("Path to the file") // don't need? 
+    }, 
+    async ({/*filepath*/}) => { // don't need?
 
-      form.append("file", fs.createReadStream(filepath));
+      try {
 
-      const options = {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${process.env.JACKAL_PIN_TOKEN}`, 
-        ...form.getHeaders(),
-        },
-        body: form,
-      };
+        const options = {
+          gb: 1000,
+          days: 365
+        }
 
-      const response = await fetch("https://pinapi.jackalprotocol.com/api/files", options);
-      const json = await response.json();
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `File uploaded successfully. Response: ${JSON.stringify(json)}`,
-          },
-        ],
-      };
-    } catch (err) {
-      const error = err as Error;
-      console.error("Upload error:", err);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to upload file: ${error.message}`,
-          },
-        ],
-      };
-    }
-  }
-)
-
-server.tool(
-  "send-tokens",
-  "Send tokens to a user",
-  {
-    recipient: z.string().describe("The recipient's address"),
-    amount: z.string().describe("Amount of tokens to send (without denomination)"),
-  },
-  async ({ recipient, amount }) => {
-    console.log("send-tokens tool called with:", { recipient, amount });
-    try {
-      // Force reload environment variables
-      const envPath = path.resolve(process.cwd(), '.env');
-      console.log("Loading .env from:", envPath);
-      const envConfig = dotenv.config({ path: envPath });
-      console.log("Env config result:", envConfig);
-      console.log("JKLTESTSEED value:", process.env.JKLTESTSEED);
-
-      console.log("About to get mnemonic...");
-      const mnemonic = getMnemonic("JKLTESTSEED");
-      console.log("Got mnemonic successfully");
-
-      console.log("About to connect...");
-      const { client, address } = await connect(mnemonic, jklTestnetConfig);
-      console.log("Connected successfully");
+        await storagehandler.purchaseStoragePlan(options)
       
-      // check if given wallet has enough balance 
-      console.log("Checking balance...");
-      const {amount: balance} = await client.getBalance(address, wasmdConfig.feeToken); 
-      console.log("Balance checked:", balance);
-
-      // Send tokens
-      const fee = {
-        amount: [{ denom: "ujkl", amount: "5000" }],
-        gas: "200000",
-      };
-
-      // Convert amount to micro tokens (1 token = 1,000,000 micro tokens)
-      const microAmount = (parseInt(amount) * 1000000).toString();
-
-      console.log("Sending tokens...");
-      const result = await client.sendTokens(
-        address,
-        recipient,
-        [{ denom: "ujkl", amount: microAmount }],
-        fee
-      );
-      console.log("Tokens sent successfully");
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully sent ${amount} tokens to ${recipient}. Transaction hash: ${result.transactionHash}`,
-          },
-        ],
-      };
-    } catch (error) {
-      console.error("Error in send-tokens:", error);
-      throw error;
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully purchased storage.`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("Purchase error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to buy storage: ${error.message}`,
+            },
+          ],
+        };
+      }
     }
-  },
-);
+  )
+
+  // can register more tools here 
+}
+
+async function init() {
+  dotenv.config();
+
+  try {
+
+    const mnemonic = `${process.env.JKLTESTSEED}`;
+    console.log("mnemonic:", mnemonic);
+    console.log("mnemonic length:", mnemonic.split(" ").length);
+
+    const setup: IClientSetup = {
+      selectedWallet: "mnemonic",
+      mnemonic,
+      ...testnet, 
+      networks: ['jackal'] as TSockets[],
+  }
+
+  console.log("got setup object")
+
+  const myClient = await ClientHandler.connect(setup)
+  console.log("connected to the client handler")
+  const storage: IStorageHandler = await myClient.createStorageHandler()
+  console.log("created storage handler")
+  storage.loadProviderPool()
+  console.log("loaded provider pool")
+
+  return storage;
+  } catch (e) {
+    console.error("Error during Jackal init:", e);
+    throw(e)
+  }
+}
 
 // Start the server
 async function main() {
+  const storageHandler = await init();
+  registerTools(storageHandler); // 🔥 all tools now wired up with shared access
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Weather MCP Server running on stdio");
+  console.error("Jackal MCP Server running on stdio");
+
+  // TODO: I don't think we need the express server
+  startExpressServer(storageHandler); // Both MCP and express should be running here
+  console.log("everything ready to go!")
 }
 
 main().catch((error) => {
