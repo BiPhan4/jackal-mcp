@@ -33,38 +33,6 @@ function startExpressServer(storage: IStorageHandler) {
 
 }
 
-async function init() {
-  dotenv.config();
-
-  try {
-
-    const mnemonic = `${process.env.JKLTESTSEED}`;
-    console.log("mnemonic:", mnemonic);
-    console.log("mnemonic length:", mnemonic.split(" ").length);
-
-    const setup: IClientSetup = {
-      selectedWallet: "mnemonic",
-      mnemonic,
-      ...testnet, 
-      networks: ['jackal'] as TSockets[],
-  }
-
-  console.log("got setup object")
-
-  const myClient = await ClientHandler.connect(setup)
-  console.log("connected to the client handler")
-  const storage: IStorageHandler = await myClient.createStorageHandler()
-  console.log("created storage handler")
-  storage.loadProviderPool()
-  console.log("loaded provider pool")
-
-  return storage;
-  } catch (e) {
-    console.error("Error during Jackal init:", e);
-    throw(e)
-  }
-}
-
 // Create server instance
 const server = new McpServer({
   name: "weather",
@@ -117,6 +85,39 @@ server.tool(
   }
 )
 
+
+async function init() {
+  dotenv.config();
+
+  try {
+
+    const mnemonic = `${process.env.JKLTESTSEED}`;
+    console.log("mnemonic:", mnemonic);
+    console.log("mnemonic length:", mnemonic.split(" ").length);
+
+    const setup: IClientSetup = {
+      selectedWallet: "mnemonic",
+      mnemonic,
+      ...testnet, 
+      networks: ['jackal'] as TSockets[],
+  }
+
+  console.log("got setup object")
+
+  const myClient = await ClientHandler.connect(setup)
+  console.log("connected to the client handler")
+  const storage: IStorageHandler = await myClient.createStorageHandler()
+  console.log("created storage handler")
+  storage.loadProviderPool()
+  console.log("loaded provider pool")
+
+  return storage;
+  } catch (e) {
+    console.error("Error during Jackal init:", e);
+    throw(e)
+  }
+}
+
 // Start the server
 async function main() {
   const transport = new StdioServerTransport();
@@ -125,6 +126,7 @@ async function main() {
 
   const storageHandler = await init();
   startExpressServer(storageHandler); // Both MCP and express should be running here
+  console.log("everything ready to go!")
 }
 
 main().catch((error) => {
