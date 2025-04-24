@@ -93,10 +93,10 @@ export const mainnet = {
 
 export const testnet = {
   chainConfig: {
-      chainId: mainnetChainID,
-      chainName: 'Jackal Main Net',
-      rpc: 'https://internalrpc.jackalprotocol.com',
-      rest: 'https://internalapi.jackalprotocol.com',
+      chainId: testnetChainID,
+      chainName: 'Jackal Test Net',
+      rpc: 'https://testnet-rpc.jackalprotocol.com:443',
+      rest: 'https://testnet-rpc.jackalprotocol.com:443',
       bip44: {
           coinType: 118
       },
@@ -134,8 +134,8 @@ export const testnet = {
       ],
       features: []
   },
-  chainId: mainnetChainID,
-  endpoint: 'https://internalrpc.jackalprotocol.com',
+  chainId: testnetChainID,
+  endpoint: 'https://testnet-rpc.jackalprotocol.com:443',
   options: {},
   networks: ['jackal']
 }
