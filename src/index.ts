@@ -36,9 +36,14 @@ function startExpressServer(storage: IStorageHandler) {
 async function init() {
 
   try {
+
+    const mnemonic = `${process.env.JKLTESTSEED}`;
+    console.log("mnemonic:", mnemonic);
+    console.log("mnemonic length:", mnemonic.split(" ").length);
+
     const setup: IClientSetup = {
       selectedWallet: "mnemonic",
-      mnemonic: `${process.env.JKLTESTSEED}`,
+      mnemonic,
       ...testnet, 
       networks: ['jackal'] as TSockets[],
   }
