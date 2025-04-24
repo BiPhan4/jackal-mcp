@@ -114,12 +114,12 @@ async function init() {
 
 // Start the server
 async function main() {
+  const storageHandler = await init();
+  registerTools(storageHandler); // 🔥 all tools now wired up with shared access
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("Jackal MCP Server running on stdio");
-
-  const storageHandler = await init();
-  registerTools(storageHandler); // 🔥 all tools now wired up with shared access
 
   // TODO: I don't think we need the express server
   startExpressServer(storageHandler); // Both MCP and express should be running here
