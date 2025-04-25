@@ -77,6 +77,43 @@ export function registerTools(storagehandler: IStorageHandler) {
     }
   )
 
+  server.tool(
+    "upload-file",
+    "upload a file to the jackal protocol",
+    {
+      filepath: z.string().describe("Path to the file")
+    }, 
+    async ({filepath}) => { // don't need?
+
+      try {
+
+        await storagehandler.upgradeSigner()
+        await storagehandler.initStorage()
+        await storagehandler.loadDirectory('Home')
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully uploaded a file`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("Purchase error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to upload a file: ${error.message}`,
+            },
+          ],
+        };
+      }
+    }
+  )
+
   // can register more tools here 
 }
 
