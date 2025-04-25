@@ -107,7 +107,8 @@ export function registerTools(storagehandler: IStorageHandler) {
           type: type, 
         })
         await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues()
+        const result = await storagehandler.processAllQueues()
+        console.log("processAllQueues result:", result); 
 
         return {
           content: [
@@ -125,6 +126,46 @@ export function registerTools(storagehandler: IStorageHandler) {
             {
               type: "text",
               text: `Failed to upload a file: ${error.message}`,
+            },
+          ],
+        };
+      }
+    }
+  )
+
+  server.tool(
+    "download-file",
+    "download a file from the jackal protocol",
+    {
+      name: z.string().describe("name of file")
+    }, 
+    async ({name}) => { // don't need?
+
+      try {
+
+        const tracker = { progress: 0, chunks: [] }
+        const myFileName = name
+
+        const myFile = await storagehandler.downloadFile(`Home/${myFileName}`, tracker)
+        
+        
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully downloaded a file: ${myFile}`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("download error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to download a file: ${error.message}`,
             },
           ],
         };
