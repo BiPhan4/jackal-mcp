@@ -13,10 +13,11 @@ import fetch from "node-fetch";
 import fs from "fs";    
 import { Request, Response } from 'express';
 import WebSocket from 'ws';
+import mime from "mime-types";
 (globalThis as any).WebSocket = WebSocket; 
 import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
-import type { IClientSetup, IStorageHandler } from '@jackallabs/jackal.js'
+import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@jackallabs/jackal.js'
 
 // jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
 
@@ -87,21 +88,38 @@ export function registerTools(storagehandler: IStorageHandler) {
 
       try {
 
+        
+        const options: IReadFolderContentOptions = {
+          path: 'Home'
+        };
+
         await storagehandler.upgradeSigner()
         await storagehandler.initStorage()
-        await storagehandler.loadDirectory('Home')
+        await storagehandler.loadDirectory(options)
+
+        // convert file from path into 'File' object
+        const absolutePath = path.resolve(filepath);
+        const fileBuffer = fs.readFileSync(absolutePath);
+        const filename = path.basename(absolutePath);
+
+        const type = mime.lookup(absolutePath) || "application/octet-stream";
+        const file = new File([fileBuffer], filename, {
+          type: type, 
+        })
+        await storagehandler.queuePrivate(file)
+        await storagehandler.processAllQueues()
 
         return {
           content: [
             {
               type: "text",
-              text: `Successfully uploaded a file`,
+              text: `Successfully uploaded a file: ${filename}`,
             },
           ],
         };
       } catch (err) {
         const error = err as Error;
-        console.error("Purchase error:", err);
+        console.error("Upload error:", err);
         return {
           content: [
             {
