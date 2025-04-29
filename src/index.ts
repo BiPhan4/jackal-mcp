@@ -107,8 +107,8 @@ export function registerTools(storagehandler: IStorageHandler) {
           type: type, 
         })
         await storagehandler.queuePrivate(file)
-        const result = await storagehandler.processAllQueues()
-        console.log("processAllQueues result:", result); 
+        await storagehandler.processAllQueues()
+        // console.log("processAllQueues result:", result); 
 
         return {
           content: [
@@ -198,8 +198,8 @@ async function init() {
   console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
-  storage.loadProviderPool()
-  console.log("loaded provider pool")
+  // storage.loadProviderPool()
+  // console.log("loaded provider pool")
 
   return storage;
   } catch (e) {
