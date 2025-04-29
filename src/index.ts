@@ -13,10 +13,11 @@ import fetch from "node-fetch";
 import fs from "fs";    
 import { Request, Response } from 'express';
 import WebSocket from 'ws';
+import mime from "mime-types";
 (globalThis as any).WebSocket = WebSocket; 
 import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
-import type { IClientSetup, IStorageHandler } from '@jackallabs/jackal.js'
+import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@jackallabs/jackal.js'
 
 // jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
 
@@ -70,6 +71,101 @@ export function registerTools(storagehandler: IStorageHandler) {
             {
               type: "text",
               text: `Failed to buy storage: ${error.message}`,
+            },
+          ],
+        };
+      }
+    }
+  )
+
+  server.tool(
+    "upload-file",
+    "upload a file to the jackal protocol",
+    {
+      filepath: z.string().describe("Path to the file")
+    }, 
+    async ({filepath}) => { // don't need?
+
+      try {
+
+        
+        const options: IReadFolderContentOptions = {
+          path: 'Home'
+        };
+
+        await storagehandler.upgradeSigner()
+        await storagehandler.initStorage()
+        await storagehandler.loadDirectory(options)
+
+        // convert file from path into 'File' object
+        const absolutePath = path.resolve(filepath);
+        const fileBuffer = fs.readFileSync(absolutePath);
+        const filename = path.basename(absolutePath);
+
+        const type = mime.lookup(absolutePath) || "application/octet-stream";
+        const file = new File([fileBuffer], filename, {
+          type: type, 
+        })
+        await storagehandler.queuePrivate(file)
+        await storagehandler.processAllQueues()
+        // console.log("processAllQueues result:", result); 
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully uploaded a file: ${filename}`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("Upload error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to upload a file: ${error.message}`,
+            },
+          ],
+        };
+      }
+    }
+  )
+
+  server.tool(
+    "download-file",
+    "download a file from the jackal protocol",
+    {
+      name: z.string().describe("name of file")
+    }, 
+    async ({name}) => { // don't need?
+
+      try {
+
+        const tracker = { progress: 0, chunks: [] }
+        const myFileName = name
+
+        const myFile = await storagehandler.downloadFile(`Home/${myFileName}`, tracker)
+        
+        
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully downloaded a file: ${myFile}`,
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err as Error;
+        console.error("download error:", err);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to download a file: ${error.message}`,
             },
           ],
         };
