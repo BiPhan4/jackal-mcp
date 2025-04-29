@@ -23,14 +23,6 @@ import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@
 
 const chainId = 'lupulella-2'
 
-function startExpressServer(storage: IStorageHandler) {
-
-  const express = require('express')
-  const app = express()
-  const port = 3088
-
-}
-
 // Create server instance
 const server = new McpServer({
   name: "jackal",
@@ -217,8 +209,6 @@ async function main() {
   await server.connect(transport);
   console.error("Jackal MCP Server running on stdio");
 
-  // TODO: I don't think we need the express server
-  startExpressServer(storageHandler); // Both MCP and express should be running here
   console.log("everything ready to go!")
 }
 
