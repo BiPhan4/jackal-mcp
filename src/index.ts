@@ -18,6 +18,7 @@ import mime from "mime-types";
 import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
 import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@jackallabs/jackal.js'
+import {Blob} from 'buffer';
 
 // jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
 
@@ -95,10 +96,8 @@ export function registerTools(storagehandler: IStorageHandler) {
         const filename = path.basename(absolutePath);
 
         const type = mime.lookup(absolutePath) || "application/octet-stream";
-        const file = new File([fileBuffer], filename, {
-          type: type, 
-        })
-        await storagehandler.queuePrivate(file)
+        const blob = new Blob([fileBuffer], { type });
+        await storagehandler.queuePrivate(blob)
         await storagehandler.processAllQueues()
         // console.log("processAllQueues result:", result); 
 
