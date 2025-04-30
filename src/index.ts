@@ -93,7 +93,7 @@ export function registerTools(storagehandler: IStorageHandler) {
         console.log("filename is:", filename)  
 
         await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues({ monitorTimeout: 60 })
+        await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/)
         // console.log("processAllQueues result:", result); 
 
         return {
