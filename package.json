@@ -18,6 +18,7 @@
     "cosmwasm": "^1.1.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "fetch-blob": "^4.0.0",
     "form-data": "^4.0.2",
     "mime-types": "^3.0.1",
     "node-fetch": "^3.3.2",
