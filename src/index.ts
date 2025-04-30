@@ -19,7 +19,7 @@ import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
 import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@jackallabs/jackal.js'
 import {Blob} from 'buffer';
-import { File } from 'undici/formdata';
+import { File } from 'formdata-node';
 
 
 // jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
@@ -99,11 +99,8 @@ export function registerTools(storagehandler: IStorageHandler) {
 
         const type = mime.lookup(absolutePath) || "application/octet-stream";
 
-        const file = new File(
-          [fileBuffer], 
-          filename, {
-          type: type, 
-        })
+        const file = new File([fileBuffer], filename, { type });
+
         await storagehandler.queuePrivate(file)
         await storagehandler.processAllQueues()
         // console.log("processAllQueues result:", result); 
@@ -180,8 +177,6 @@ async function init() {
   try {
 
     const mnemonic = `${process.env.JKLTESTSEED}`;
-    console.log("mnemonic:", mnemonic);
-    console.log("mnemonic length:", mnemonic.split(" ").length);
 
     const setup: IClientSetup = {
       selectedWallet: "mnemonic",
