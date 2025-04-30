@@ -79,7 +79,7 @@ export function registerTools(storagehandler: IStorageHandler) {
       filepath: z.string().describe("Path to the file")
     }, 
     async ({filepath}) => { // don't need?
-      console.log("make it here? 1")
+      process.stdout.write("make it here? 1\n");
 
       try {
 
@@ -198,7 +198,7 @@ async function init() {
   return storage;
   } catch (e) {
     console.error("Error during Jackal init:", e);
-    throw(e)
+    throw(e) 
   }
 }
 
