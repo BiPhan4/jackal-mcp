@@ -202,7 +202,7 @@ async function init() {
 async function main() {
   const storageHandler = await init();
   const options: IReadFolderContentOptions = {
-    path: 'Home/movies/'
+    path: 'Home/movies'
   };
 
   await storageHandler.upgradeSigner()
