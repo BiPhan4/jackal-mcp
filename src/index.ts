@@ -82,15 +82,6 @@ export function registerTools(storagehandler: IStorageHandler) {
 
       try {
 
-        
-        const options: IReadFolderContentOptions = {
-          path: 'Home'
-        };
-
-        await storagehandler.upgradeSigner()
-        await storagehandler.initStorage()
-        await storagehandler.loadDirectory(options)
-
         // convert file from path into 'File' object
         const absolutePath = path.resolve(filepath);
         const fileBuffer = fs.readFileSync(absolutePath);
@@ -99,9 +90,10 @@ export function registerTools(storagehandler: IStorageHandler) {
         const type = mime.lookup(absolutePath) || "application/octet-stream";
 
         const file = new File([fileBuffer], filename, { type });
+        console.log("filename is:", filename)  
 
         await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues()
+        await storagehandler.processAllQueues({ monitorTimeout: 60 })
         // console.log("processAllQueues result:", result); 
 
         return {
@@ -114,12 +106,12 @@ export function registerTools(storagehandler: IStorageHandler) {
         };
       } catch (err) {
         const error = err as Error;
-        console.error("Upload error:", err);
+        console.error("Uploading error:", err);
         return {
           content: [
             {
               type: "text",
-              text: `Failed to upload a file: ${error.message}`,
+              text: `Could not upload a file: ${error.message}`,
             },
           ],
         };
@@ -190,19 +182,33 @@ async function init() {
   console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
-  storage.loadProviderPool()
-  console.log("loaded provider pool")
+
+  const initPool = {
+    jkl1yvnfpj68wtdxpyfpwa7fgrf8gcdnf6pw9d8jcr: "https://tprov01.jackallabs.io",
+  }
+
+  const pool = await storage.loadProviderPool(initPool)
+  console.log("=== Pool Loaded?===")
+  console.dir(pool, { depth: null});
 
   return storage;
   } catch (e) {
     console.error("Error during Jackal init:", e);
-    throw(e)
+    throw(e) 
   }
 }
 
 // Start the server
 async function main() {
   const storageHandler = await init();
+  const options: IReadFolderContentOptions = {
+    path: 'Home/movies'
+  };
+
+  await storageHandler.upgradeSigner()
+  await storageHandler.initStorage()
+  await storageHandler.loadDirectory(options)
+
   registerTools(storageHandler); // 🔥 all tools now wired up with shared access
 
   const transport = new StdioServerTransport();
