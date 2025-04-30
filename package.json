@@ -13,7 +13,7 @@
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.33.1",
     "@cosmjs/proto-signing": "^0.33.1",
-    "@jackallabs/jackal.js": "^3.6.3",
+    "@jackallabs/jackal.js": "^3.6.4",
     "@modelcontextprotocol/sdk": "^1.7.0",
     "cosmwasm": "^1.1.1",
     "dotenv": "^16.5.0",
