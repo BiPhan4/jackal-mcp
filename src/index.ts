@@ -79,7 +79,6 @@ export function registerTools(storagehandler: IStorageHandler) {
       filepath: z.string().describe("Path to the file")
     }, 
     async ({filepath}) => { // don't need?
-      throw new Error(`Intentional early throw for test. Filepath is: ${filepath}`);
 
       try {
 
@@ -101,6 +100,14 @@ export function registerTools(storagehandler: IStorageHandler) {
 
         const file = new File([fileBuffer], filename, { type });
         console.log("filename is:", filename)
+
+        throw new Error(
+          `File debug info:\n` +
+          `name: ${file.name}\n` +
+          `size: ${file.size}\n` +
+          `type: ${file.type}\n` +
+          `lastModified: ${file.lastModified}`
+        );        
 
         await storagehandler.queuePrivate(file)
         await storagehandler.processAllQueues()
