@@ -82,15 +82,6 @@ export function registerTools(storagehandler: IStorageHandler) {
 
       try {
 
-        
-        const options: IReadFolderContentOptions = {
-          path: 'Home'
-        };
-
-        await storagehandler.upgradeSigner()
-        await storagehandler.initStorage()
-        await storagehandler.loadDirectory(options)
-
         // convert file from path into 'File' object
         const absolutePath = path.resolve(filepath);
         const fileBuffer = fs.readFileSync(absolutePath);
@@ -99,15 +90,7 @@ export function registerTools(storagehandler: IStorageHandler) {
         const type = mime.lookup(absolutePath) || "application/octet-stream";
 
         const file = new File([fileBuffer], filename, { type });
-        console.log("filename is:", filename)
-
-        throw new Error(
-          `File debug info:\n` +
-          `name: ${file.name}\n` +
-          `size: ${file.size}\n` +
-          `type: ${file.type}\n` +
-          `lastModified: ${file.lastModified}`
-        );        
+        console.log("filename is:", filename)  
 
         await storagehandler.queuePrivate(file)
         await storagehandler.processAllQueues()
@@ -212,6 +195,14 @@ async function init() {
 // Start the server
 async function main() {
   const storageHandler = await init();
+  const options: IReadFolderContentOptions = {
+    path: 'Home'
+  };
+
+  await storageHandler.upgradeSigner()
+  await storageHandler.initStorage()
+  await storageHandler.loadDirectory(options)
+
   registerTools(storageHandler); // 🔥 all tools now wired up with shared access
 
   const transport = new StdioServerTransport();
