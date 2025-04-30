@@ -190,10 +190,6 @@ async function init() {
   const pool = await storage.loadProviderPool(initPool)
   console.log("=== Pool Loaded?===")
   console.dir(pool, { depth: null});
-  
-  if (!Array.isArray(pool) || pool.length === 0 || pool.every(p => !p.value)) {
-    throw new Error("No valid storage providers found.");
-  }
 
   return storage;
   } catch (e) {
@@ -206,7 +202,7 @@ async function init() {
 async function main() {
   const storageHandler = await init();
   const options: IReadFolderContentOptions = {
-    path: 'Home'
+    path: 'Home/pics/'
   };
 
   await storageHandler.upgradeSigner()
