@@ -79,6 +79,7 @@ export function registerTools(storagehandler: IStorageHandler) {
       filepath: z.string().describe("Path to the file")
     }, 
     async ({filepath}) => { // don't need?
+      console.log("make it here? 1")
 
       try {
 
@@ -99,6 +100,7 @@ export function registerTools(storagehandler: IStorageHandler) {
         const type = mime.lookup(absolutePath) || "application/octet-stream";
 
         const file = new File([fileBuffer], filename, { type });
+        console.log("filename is:", filename)
 
         await storagehandler.queuePrivate(file)
         await storagehandler.processAllQueues()
@@ -190,7 +192,7 @@ async function init() {
   console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
-  storage.loadProviderPool()
+  const pool = storage.loadProviderPool()
   console.log("loaded provider pool")
 
   return storage;
