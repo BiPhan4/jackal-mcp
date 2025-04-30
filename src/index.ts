@@ -79,7 +79,7 @@ export function registerTools(storagehandler: IStorageHandler) {
       filepath: z.string().describe("Path to the file")
     }, 
     async ({filepath}) => { // don't need?
-      process.stdout.write("make it here? 1\n");
+      throw new Error(`Intentional early throw for test. Filepath is: ${filepath}`);
 
       try {
 
