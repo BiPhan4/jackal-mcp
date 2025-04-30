@@ -93,8 +93,8 @@ export function registerTools(storagehandler: IStorageHandler) {
         console.log("filename is:", filename)  
 
         await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/)
-        // console.log("processAllQueues result:", result); 
+        await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/) // NOTE: we disabled this to see if updated jjs solves our problems. 
+                                                                                // can bring it back in the future to inspect MCP timeout issues
 
         return {
           content: [
@@ -222,3 +222,13 @@ main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
+
+/*
+NOTE: Why websocket errors?
+
+Jackal.js | convertToWebP(): ReferenceError: FileReader is not defined
+TypeError: Cannot read properties of undefined (reading 'data')
+    at client.onmessage (/Users/biphan/jackal/jackal-mcp/node_modules/@jackallabs/jackal.js/dist/index.cjs.js:227:28)
+
+
+*/
