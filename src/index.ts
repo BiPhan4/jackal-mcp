@@ -183,6 +183,9 @@ async function init() {
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
   const pool = await storage.loadProviderPool()
+  if (!Array.isArray(pool) || pool.length === 0 || pool.every(p => !p.value)) {
+    throw new Error("No valid storage providers found.");
+  }
   console.log(`provider pool"`, pool)
 
   return storage;
