@@ -182,11 +182,18 @@ async function init() {
   console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
-  const pool = await storage.loadProviderPool()
+
+  const initPool = {
+    jkl1yvnfpj68wtdxpyfpwa7fgrf8gcdnf6pw9d8jcr: "https://tprov01.jackallabs.io",
+  }
+
+  const pool = await storage.loadProviderPool(initPool)
+  console.log("=== Pool Loaded?===")
+  console.dir(pool, { depth: null});
+  
   if (!Array.isArray(pool) || pool.length === 0 || pool.every(p => !p.value)) {
     throw new Error("No valid storage providers found.");
   }
-  console.log(`provider pool"`, pool)
 
   return storage;
   } catch (e) {
