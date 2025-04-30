@@ -114,12 +114,12 @@ export function registerTools(storagehandler: IStorageHandler) {
         };
       } catch (err) {
         const error = err as Error;
-        console.error("Upload error:", err);
+        console.error("Uploading error:", err);
         return {
           content: [
             {
               type: "text",
-              text: `Failed to upload a file: ${error.message}`,
+              text: `Could not upload a file: ${error.message}`,
             },
           ],
         };
