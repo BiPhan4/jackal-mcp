@@ -182,8 +182,8 @@ async function init() {
   console.log("connected to the client handler")
   const storage: IStorageHandler = await myClient.createStorageHandler()
   console.log("created storage handler")
-  const pool = storage.loadProviderPool()
-  console.log("loaded provider pool")
+  const pool = await storage.loadProviderPool()
+  console.log(`provider pool"`, pool)
 
   return storage;
   } catch (e) {
