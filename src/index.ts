@@ -19,7 +19,8 @@ import { TSockets } from "@jackallabs/jackal.js";
 import { ClientHandler } from '@jackallabs/jackal.js'
 import type { IClientSetup, IStorageHandler, IReadFolderContentOptions } from '@jackallabs/jackal.js'
 import {Blob} from 'buffer';
-import { File } from 'fetch-blob';
+import { File } from 'undici';
+
 
 // jjs quickstart:   https://docs.jackalprotocol.com/devs/jjs-quickstart.html
 
