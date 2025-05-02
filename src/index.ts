@@ -92,10 +92,23 @@ export function registerTools(storagehandler: IStorageHandler) {
         const file = new File([fileBuffer], filename, { type });
         console.log("filename is:", filename)  
 
-        await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/) // NOTE: we disabled this to see if updated jjs solves our problems. 
-                                                                                // can bring it back in the future to inspect MCP timeout issues
-
+        try {
+          await storagehandler.queuePrivate(file)
+          await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/)
+          // NOTE: we disabled this to see if updated jjs solves our problems. 
+          // can bring it back in the future to inspect MCP timeout issues
+        } catch (e) {
+          console.warn("Queue processing failed or was interrupted:", e);
+          return {
+            content: [
+              {
+                type: "text",
+                text: `File queued but not confirmed uploaded: ${filename}`,
+              },
+            ],
+          };
+        }
+                                                                                
         return {
           content: [
             {
