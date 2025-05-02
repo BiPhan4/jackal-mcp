@@ -94,7 +94,7 @@ export function registerTools(storagehandler: IStorageHandler) {
 
         try {
           await storagehandler.queuePrivate(file)
-          await storagehandler.processAllQueues({ monitorTimeout: 300 })
+          await storagehandler.processAllQueues({ /*monitorTimeout: 300*/ })
           // NOTE: we disabled this to see if updated jjs solves our problems. 
           // can bring it back in the future to inspect MCP timeout issues
         } catch (e) {
