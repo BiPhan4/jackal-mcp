@@ -94,7 +94,7 @@ export function registerTools(storagehandler: IStorageHandler) {
 
         try {
           await storagehandler.queuePrivate(file)
-          await storagehandler.processAllQueues({ monitorTimeout: 60 })
+          await storagehandler.processAllQueues({ monitorTimeout: 30 })
           // NOTE: we disabled this to see if updated jjs solves our problems. 
           // can bring it back in the future to inspect MCP timeout issues
         } catch (e) {
@@ -186,7 +186,7 @@ async function init() {
       selectedWallet: "mnemonic",
       mnemonic,
       ...testnet, 
-      networks: ['jackal'] as TSockets[],
+      networks: ['jackaltest'] as TSockets[],
   }
 
   console.log("got setup object")
