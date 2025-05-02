@@ -137,5 +137,5 @@ export const testnet = {
   chainId: testnetChainID,
   endpoint: 'https://testnet-rpc.jackalprotocol.com:443',
   options: {},
-  networks: ['jackal']
+  networks: ['jackaltest']
 }
