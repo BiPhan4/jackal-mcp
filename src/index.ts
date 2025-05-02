@@ -93,7 +93,7 @@ export function registerTools(storagehandler: IStorageHandler) {
         console.log("filename is:", filename)  
 
         await storagehandler.queuePrivate(file)
-        await storagehandler.processAllQueues(/*{ monitorTimeout: 60 }*/) // NOTE: we disabled this to see if updated jjs solves our problems. 
+        await storagehandler.processAllQueues({ monitorTimeout: 60 }) // NOTE: we disabled this to see if updated jjs solves our problems. 
                                                                                 // can bring it back in the future to inspect MCP timeout issues
 
         return {
